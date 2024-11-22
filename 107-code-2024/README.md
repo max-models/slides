@@ -2,7 +2,7 @@
 
 _For Web Directions Code. This is a sort-of transcript plus my notes for the talk._
 
-ello everyone! It's really nice to be here at Web Directions Code in person again. The last time I was in Melbourne for this was 2018, so yeah, it's been a while. And I said it before yesterday, but I'll say it again, as a child of the tropics, I love this frigid weather. The tropics are frustratingly hot and humid right now.
+Hello everyone! It's really nice to be here at Web Directions Code in person again. The last time I was in Melbourne for this was 2018, so yeah, it's been a while. And I said it before yesterday, but I'll say it again, as a child of the tropics, I love this frigid weather. The tropics are frustratingly hot and humid right now.
 
 I currently work at the Interledger Foundation. In a nutshell, we are developing a new protocol to enable an interoperable global payments network. If any of those words mean anything to you and you'd like to find out more, happy to have a chat later. Or just talk to me about CSS, I'd love that too.
 

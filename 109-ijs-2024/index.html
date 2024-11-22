@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Expanding the browser experience with web extensions</title>
+
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/jing.css" id="theme">
+    <link rel="stylesheet" href="plugin/highlight/atom-one-light.css" id="highlight-theme">
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section>
+          <h1>Expanding the browser experience with web extensions</h1>
+          <p><small>By <a href="https://chenhuijing.com/">Chen Hui Jing</a> / <a href="https://bsky.app/profile/huijing.bsky.social">@huijing.bsky.social</a></small></p>
+          <aside class="notes">Hello everyone at IJS! First of all, I want to express my gratitude that you chose hang out in this room for the General Web Development track to listen to me talk about web extensions when you could have been somewhere else, anywhere else, for that matter. So thank you all for being here.</aside>
+        </section>
+
+        <section>
+          <div class="intro-grid">
+            <span class="emoji" role="img" tabindex="0" aria-label="Malaysia">&#x1F1F2;&#x1F1FE;</span>
+            <span class="emoji" role="img" tabindex="0" aria-label="alien monster">&#x1F47E;</span>
+            <span class="emoji" role="img" tabindex="0" aria-label="basketball">&#x1F3C0;</span>
+            <span class="emoji" role="img" tabindex="0" aria-label="bicycle">&#x1F6B2;</span>
+            <span class="emoji" role="img" tabindex="0" aria-label="paintbrush">&#x1F58C;&#xFE0F;</span>
+            <span class="emoji" role="img" tabindex="0" aria-label="sneaker">&#x1F45F;</span>
+            <span class="emoji" role="img" tabindex="0" aria-label="laptop computer">&#x1F4BB;</span>
+            <span class="emoji" role="img" tabindex="0" aria-label="pen">&#x1F58A;&#xFE0F;</span>
+            <span class="emoji" role="img" tabindex="0" aria-label="studio microphone">&#x1F399;</span>
+            <span class="emoji" role="img" tabindex="0" aria-label="black cat">&#x1F408;&#x200D;&#x2B1B;</span>
+            <span class="emoji" role="img" tabindex="0" aria-label="person climbing">&#x1F9D7;</span>
+            <span class="emoji" role="img" tabindex="0" aria-label="Rainbow flag">&#x1F3F3;&#xFE0F;&#x200D;&#x1F308;</span>
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center">
+              <img data-src="img/name.svg" alt="Chen Hui Jing" class="plain" style="max-height: 20vh" />
+              <div>
+                <img data-src="img/avatar.jpg" alt="Jing" style="border-radius: 50%; max-height: 30vh" />
+              </div>
+              <a href="https://bsky.app/profile/huijing.bsky.social">@huijing.bsky.social</a>
+            </div>
+          </div>
+          <aside class="notes">I'm always happy to speak in front of a more local crowd, local to me, that is, because then I don't have to explain my name as thoroughly. But just in case you are unfamiliar with Chinese names, this is the graphic I use to explain mine. Also, I have been on BlueSky since mid-2023 and all of a sudden in the past 3 weeks or so, it just exploded. So might as well put my link up here, I guess?</aside>
+        </section>
+
+        <section>
+          <img data-src="img/ilf.svg" alt="Interledger Foundation" class="plain" style="max-height: 20vh" />
+          <aside class="notes">I do have a day job, because I need to pay my bills and feed myself. And the organisation who is paying my CPF at the moment is the Interledger Foundation, which is a non-profit headquartered in the US. And we are trying to build out an inter-network for the various payment networks that exist in the world today, so that we can live in a world where sending a payment can be as straightforward as sending an email. That's about all I'm going to say about my day-job, but if that sounded interesting to you, feel free to come chat with me about payments. Or even better, come chat with me about CSS.</aside>
+        </section>
+
+        <section>
+          <h2>Plug-ins</h2>
+          <svg style="max-height:60vh" fill="none" viewBox="0 0 564 414"><g><g class="browser"><g filter="url(#a)"><rect width="550" height="400" x="7" y="7" fill="#F4F6F9" rx="5"/></g><mask id="b" width="550" height="400" x="7" y="7" maskUnits="userSpaceOnUse" style="mask-type:luminance"><rect width="550" height="400" x="7" y="7" fill="#fff" rx="5"/></mask><g mask="url(#b)"><g filter="url(#c)"><path fill="url(#d)" d="M7 7h550v30H7z"/></g><g><path fill="#909090" d="M62.49 26h-.626v-7.273h.627v2.091c.227-.418.7-.564 1.327-.564 1.482 0 1.973.719 1.973 2.882V26h-.627v-2.864c0-1.772-.328-2.309-1.346-2.309-1.036 0-1.327.282-1.327 1.491V26Zm7.287.127c-1.218 0-1.627-.59-1.627-2.063v-3.137h-1.127v-.572h1.127v-1.628h.627v1.628h1.891v.572h-1.89v3.137c0 1.072.245 1.49 1 1.49.645 0 .835-.127 1-.563l.59.2c-.245.709-.627.936-1.59.936Zm5.46 0c-1.219 0-1.628-.59-1.628-2.063v-3.137h-1.127v-.572h1.127v-1.628h.627v1.628h1.891v.572h-1.89v3.137c0 1.072.245 1.49 1 1.49.645 0 .836-.127 1-.563l.59.2c-.245.709-.627.936-1.59.936Zm3.513 1.527h-.628v-7.272h.628v.354c.272-.354.772-.482 1.418-.482 1.536 0 2.045.746 2.045 2.928 0 2.19-.509 2.945-2.045 2.945-.655 0-1.155-.172-1.418-.645v2.172Zm1.418-2.1c1.073 0 1.418-.572 1.418-2.372 0-1.791-.345-2.355-1.418-2.355-.818 0-1.418.2-1.418.727v2.528c0 1.063.527 1.473 1.418 1.473Zm5.168.573c-.9 0-1.318-.245-1.736-1.009l.49-.4c.319.646.582.837 1.246.837 1.327 0 1.718-.264 1.718-1.11 0-.736-.327-.963-1.454-1.1-1.4-.172-1.9-.627-1.9-1.49 0-1.2.518-1.6 2.09-1.6.937 0 1.373.209 1.8.854l-.454.445c-.336-.563-.618-.727-1.346-.727-1.136 0-1.463.246-1.463 1.027 0 .5.318.764 1.29.892 1.555.209 2.064.59 2.064 1.7 0 1.263-.59 1.681-2.345 1.681Zm5.686-4.672c-.482 0-.627-.137-.627-.591 0-.446.145-.591.627-.591s.627.145.627.59c0 .455-.145.591-.627.591Zm0 4.672c-.482 0-.627-.136-.627-.59 0-.455.145-.591.627-.591s.627.136.627.59c0 .455-.145.591-.627.591Zm3.895 1.527h-.654l3.782-10.272h.654l-3.781 10.272Zm5.46 0h-.655l3.782-10.272h.654l-3.781 10.272Z"/><path fill="#292929" d="M107.254 26.127c-1.482 0-1.973-.427-1.973-1.681 0-1.346.491-1.746 1.973-1.746h1.354v-.473c0-1.036-.318-1.363-1.354-1.363-.773 0-1.046.209-1.246.927l-.6-.146c.282-1.027.737-1.39 1.846-1.39 1.491 0 1.982.536 1.982 1.972v2.31c0 .736.154.9.709.881V26c-.682.01-.982-.145-1.128-.654-.336.59-.736.781-1.563.781Zm0-.572c1.036 0 1.354-.364 1.354-1.555v-.718h-1.354c-1.046 0-1.346.227-1.346 1.163 0 .846.3 1.11 1.346 1.11Zm4.704.445h-.591l-.982-5.618h.637l.736 4.363.809-2.627h.582l.8 2.628.745-4.364h.637L114.34 26h-.591l-.891-2.827-.9 2.827Zm6.377-.445c.682 0 1.037-.191 1.491-.773l.5.336c-.545.764-1.018 1.01-1.991 1.01-1.663 0-2.182-.71-2.182-2.937s.519-2.936 2.182-2.936c1.637 0 2.155.727 2.155 3.027h-3.709c.027 1.718.409 2.273 1.554 2.273Zm0-4.728c-1.082 0-1.491.455-1.545 1.873h3.054c0-1.418-.363-1.873-1.509-1.873Zm5.214 5.3c-.9 0-1.318-.245-1.737-1.009l.491-.4c.319.646.582.837 1.246.837 1.327 0 1.718-.264 1.718-1.11 0-.736-.327-.963-1.455-1.1-1.4-.172-1.9-.627-1.9-1.49 0-1.2.519-1.6 2.091-1.6.937 0 1.373.209 1.8.854l-.454.445c-.337-.563-.618-.727-1.346-.727-1.136 0-1.463.246-1.463 1.027 0 .5.318.764 1.291.892 1.554.209 2.063.59 2.063 1.7 0 1.263-.591 1.681-2.345 1.681Zm5.686 0c-1.536 0-2.036-.754-2.036-2.936s.5-2.936 2.036-2.936 2.046.754 2.046 2.936-.51 2.936-2.046 2.936Zm0-.572c1.073 0 1.418-.564 1.418-2.364 0-1.8-.345-2.364-1.418-2.364s-1.409.564-1.409 2.364c0 1.8.336 2.364 1.409 2.364Zm3.795.445h-.627v-5.618h.627v.363c.246-.372.446-.49.837-.49.482 0 .691.181.882.736.309-.555.572-.736 1.091-.736.872 0 1.145.518 1.145 2.136V26h-.627v-3.61c0-1.163-.128-1.535-.518-1.535-.637 0-.828.363-.828 1.518V26h-.627v-3.555c0-1.2-.127-1.59-.518-1.59-.637 0-.837.363-.837 1.518V26Zm7.141-.445c.682 0 1.037-.191 1.491-.773l.5.336c-.545.764-1.018 1.01-1.991 1.01-1.663 0-2.182-.71-2.182-2.937s.519-2.936 2.182-2.936c1.637 0 2.155.727 2.155 3.027h-3.709c.027 1.718.409 2.273 1.554 2.273Zm0-4.728c-1.082 0-1.491.455-1.545 1.873h3.054c0-1.418-.363-1.873-1.509-1.873Zm5.441 5.3c-.482 0-.627-.136-.627-.59 0-.455.145-.591.627-.591s.627.136.627.59c0 .455-.145.591-.627.591Zm5.232 0c-.9 0-1.318-.245-1.737-1.009l.491-.4c.318.646.582.837 1.246.837 1.327 0 1.718-.264 1.718-1.11 0-.736-.327-.963-1.455-1.1-1.4-.172-1.9-.627-1.9-1.49 0-1.2.519-1.6 2.091-1.6.937 0 1.373.209 1.8.854l-.454.445c-.337-.563-.618-.727-1.346-.727-1.136 0-1.463.246-1.463 1.027 0 .5.318.764 1.291.892 1.554.209 2.063.59 2.063 1.7 0 1.263-.591 1.681-2.345 1.681Zm5.731-6.818c-.445 0-.581-.127-.581-.545 0-.428.136-.555.581-.555.446 0 .591.127.591.555 0 .418-.145.545-.591.545Zm.51 1.073v5.045h1.59V26h-3.809v-.573h1.591v-4.473h-1.145v-.572h1.773Zm5.495 5.745c-1.218 0-1.627-.59-1.627-2.063v-3.137h-1.128v-.572h1.128v-1.628h.627v1.628h1.891v.572h-1.891v3.137c0 1.072.245 1.49 1 1.49.645 0 .836-.127 1-.563l.591.2c-.246.709-.627.936-1.591.936Zm4.886-.572c.682 0 1.037-.191 1.491-.773l.5.336c-.545.764-1.018 1.01-1.991 1.01-1.663 0-2.182-.71-2.182-2.937s.519-2.936 2.182-2.936c1.637 0 2.155.727 2.155 3.027h-3.709c.027 1.718.409 2.273 1.554 2.273Zm0-4.728c-1.082 0-1.491.455-1.545 1.873h3.054c0-1.418-.363-1.873-1.509-1.873Z"/></g><path fill="#34C749" fill-rule="evenodd" d="M47 26a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" clip-rule="evenodd"/><path fill="#FDBC40" fill-rule="evenodd" d="M34 26a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" clip-rule="evenodd"/><path fill="#FC605C" fill-rule="evenodd" d="M21 26a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" clip-rule="evenodd"/></g></g><g class="plugins fragment"><g><path fill="#000" d="M247.528 157.401c-9.13-2.872-13.279-7.407-14.627-15.989l-.713-4.534 2.258 4.16c4.656 8.58 12.461 11.757 28.409 11.566 14.564-.174 24.859-2.406 41.712-10.715 17.998-10.34 8.918-3.064-.707 2.52-20.739 12.032-43.504 17.028-56.332 12.992Zm17.031-66.988c8.609-7.549 24.713-16.965 37.466-21.909 21.47-8.322 42.655-7.09 49.917 2.904 2.589 3.563 3.716 15.126 1.905 19.564-1.07 2.622-1.161 2.495-1.227-1.721-.099-6.22-4.34-12.12-11.101-15.444-7.636-3.754-26.233-3.732-39.494.046-10.211 2.91-27.153 10.547-35.398 15.955-4.612 3.025-4.938 3.12-2.068.605Zm45.323 30.548c0 .947.056 1.357.529 2.061.512.762.788.789 1.432 1.106 1.192.586 2.929.391 4.212 0 1.395-.425 1.915-2.112 1.915-2.112h9.798s-.581 2.254-1.373 3.52c-.928 1.482-1.686 2.241-3.178 3.263-1.467 1.004-2.477 1.373-4.233 1.846-1.974.532-3.263.521-5.239.521-2.822 0-5.363-.536-7.62-1.61-2.258-1.073-4.039-2.557-5.345-4.45-1.305-1.894-1.958-4.072-1.958-6.535 0-2.683.671-5.034 2.011-7.054 1.376-2.02 3.175-3.582 5.398-4.687 2.258-1.137 4.692-1.705 7.302-1.705 2.787 0 5.257.536 7.409 1.61 2.152 1.073 3.845 2.619 5.08 4.64 1.27 1.988 1.905 4.419 1.905 7.291v1.184s-.494-.031-.953 0h-17.092v1.111Zm3.876-6.035h3.903c0-.736-.069-1.388-.37-2.084-.248-.567-.635-1.072-1.164-1.515-.53-.441-1.235-.662-2.117-.662-.706 0-1.394.158-2.064.473-.636.284-1.146.742-1.535 1.374-.353.631-.529 1.436-.529 2.414h3.876Zm-110.554 13.778c-.956.694-2.072 1.279-3.347 1.752-1.24.473-2.692.71-4.357.71-2.656 0-4.746-.663-6.269-1.988-1.487-1.326-2.231-2.967-2.231-4.925 0-1.862.655-3.487 1.965-4.877 1.347-1.388 3.242-2.461 5.685-3.219 2.444-.789 5.331-1.184 8.66-1.184h1.168v-1.467c0-.884-.265-1.563-.797-2.036-.495-.473-1.274-.711-2.337-.711-.743 0-1.505.158-2.284.473-.78.285-1.399.869-1.86 1.753a3.567 3.567 0 0 0-.243.586h-9.191s.421-2.212.669-2.811c.814-2.021 2.372-3.457 4.675-4.309 2.337-.884 5.241-1.326 8.713-1.326 3.293 0 5.861.332 7.702.994 1.842.664 3.135 1.578 3.879 2.747.779 1.167 1.169 2.524 1.169 4.071v16.477c0 .474-.089.805-.266.995-.142.189-.46.283-.956.283h-7.278c-.461 0-.797-.157-1.01-.473a3.965 3.965 0 0 1-.372-1.184l-.054-.331c-.105-.632-.583-.632-1.433 0Zm1.275-8.617v-.852h-1.01c-.425 0-.992.079-1.7.236a8.428 8.428 0 0 0-2.019.663 5.748 5.748 0 0 0-1.753 1.136 2.362 2.362 0 0 0-.69 1.705c0 .663.265 1.199.796 1.61.532.41 1.276.615 2.231.615.709 0 1.293-.095 1.754-.284.496-.189.885-.394 1.168-.616.32-.252.603-.504.851-.757.248-.283.372-.6.372-.947v-2.51.001Zm50.687-14.366h4.595v5.48h-4.595v10.961s-.383 1.175 1.149 1.566c1.531.391 3.446.391 3.446.391v7.047h-8.808s-2.68 0-3.829-1.566c-1.149-1.565-2.298-3.523-2.298-5.48v-12.919h-3.447v-5.48h3.83v-9.787h9.957v9.787Z"/><path fill="#000" d="M242.123 114.798h-8.665s0-2.977-4.333-2.977c-2.757 0-3.546 3.72-3.546 6.325 0 2.604.395 5.951 3.546 5.951s4.333-2.604 4.333-2.604h9.453s-2.363 9.673-13.786 9.673c-7.09 0-13.786-5.208-13.786-13.02 0-3.348 1.575-13.021 12.998-13.021 12.605 0 13.786 9.673 13.786 9.673Zm20.702-9.673h10.722v26.041h-10.722v-26.041Zm21.828 0h-10.34l9.191 26.041h8.425l9.191-26.041h-6.893l-4.596 12.626-4.978-12.626ZM268.569 103.593a5.744 5.744 0 1 0 0-11.49 5.744 5.744 0 0 0 0 11.49Z"/><path fill="#F53331" d="M329.459 105.125h11.488l1.915 4.979 3.447-4.979h9.956l-9.19 12.255 6.893 13.786h-11.106l-3.83-7.659-5.361 7.659h-9.574l11.106-13.786-5.744-12.255Z"/></g><g fill-rule="evenodd" clip-rule="evenodd"><path fill="#fff" d="M287.596 186h134.102a24.232 24.232 0 0 1 17.202 7.101 24.245 24.245 0 0 1 7.101 17.202v134.395A24.25 24.25 0 0 1 438.9 361.9a24.237 24.237 0 0 1-17.202 7.1H287.596C274.127 369 263 358.167 263 344.698V210.303C263 196.834 274.127 186 287.596 186Z"/><path fill="#000" d="m299.015 348.797-1.171-2.636h-7.321v-1.463h6.735v-2.636h-6.735v-1.464h7.027l.879-2.635h-12.005v10.834h12.591Zm14.64 0v-10.834h-4.1v4.978l.294 1.172-.879-.88-4.393-5.27h-4.392v10.834h3.807v-6.15l.879 1.172 4.392 4.978h4.392Zm16.104 0-5.27-10.833h-4.686l-5.27 10.833h4.099l.879-2.05h4.978l.878 2.05h4.392Zm-6.15-4.393h-2.927l1.171-2.635.293-.877.292.877 1.171 2.635Zm20.789.88c0-1.171-.878-2.343-2.049-2.636.878-.293 1.464-1.17 1.464-2.05 0-2.343-2.343-2.634-4.099-2.634h-9.37v10.833h9.077c3.806 0 4.977-1.757 4.977-3.513Zm-4.977-4.101c0 .586-.293.586-1.172.586h-3.806v-1.171h3.806c.879 0 1.172 0 1.172.585Zm.878 4.101c0 .585-.293.877-1.757.877h-4.099v-1.757h3.806c1.465 0 2.05.294 2.05.88Zm18.154 3.513-1.171-2.636h-7.028v-8.198h-4.098v10.834h12.297Zm13.176 0-1.172-2.636h-7.612v-1.463h6.735v-2.636h-6.735v-1.464h7.32l.878-2.635h-12.004v10.834h12.59Zm15.225-5.271c0-4.391-2.928-5.563-6.441-5.563H372.8v10.833h7.319c4.978.001 6.735-2.049 6.735-5.27Zm-4.392 0c0 2.05-1.171 2.635-2.928 2.635H376.9v-5.564h2.928c1.171 0 2.634.586 2.634 2.929Zm-84.033-20.789h-12.005v10.834h4.099v-4.098h6.735v-2.636h-6.735v-1.465h7.027l.879-2.635Zm13.469 10.834-1.172-2.635h-7.027v-8.199h-3.806v10.834h12.005Zm15.226 0-5.271-10.834h-4.392l-5.271 10.834h4.1l.878-2.05h4.978l.878 2.05h4.1Zm-6.149-4.685h-2.928l1.17-2.343.293-.877.586.877.879 2.343Zm21.081.879c0-2.05-2.049-2.928-5.563-3.221h-1.465c-2.05 0-2.635-.292-2.635-.877 0-.294.879-.586 2.05-.586.879 0 1.465.292 1.757.586.293 0 .293.292.293.292l4.685-.292v-.586c-.878-1.465-2.635-2.635-6.735-2.635-3.807 0-6.442 1.17-6.442 3.513 0 2.05 1.757 2.928 5.564 3.221h1.757c1.757.294 2.342.294 2.342 1.171 0 .293-.878.878-2.342.878-1.172 0-2.049-.293-2.343-.878l-.292-.293-4.977.293v.293c.586 2.05 2.635 3.221 7.319 3.221 4.978-.001 7.027-1.465 7.027-4.1Zm14.933 3.806v-10.834h-4.1v3.807h-5.27v-3.807h-4.099v10.834h4.099v-4.392h5.27v4.392h4.1Zm-52.704-15.225v-6.149c0-2.05-.878-4.391-4.1-4.391-2.342 0-3.513.877-4.099 2.049-.586-1.464-2.049-2.049-3.806-2.049-2.049 0-3.22 1.17-3.806 1.756v-1.756h-1.757v10.54h1.757v-6.734c.586-.879 1.464-2.344 3.514-2.344 1.464 0 2.635 1.172 2.635 2.928v6.149h1.756v-6.149c0-1.171.879-2.928 3.221-2.928 2.049 0 2.635 1.464 2.635 3.221v5.856h2.05v.001Zm14.347 0v-1.171h-.585c-.586-.293-.879-.587-.879-1.464v-4.392c0-2.343-1.464-3.513-4.685-3.513-2.343 0-4.1.877-4.977 2.049l.877.878c.879-1.171 2.636-1.464 4.1-1.464 2.049 0 2.635.586 2.635 1.464 0 .586-.292.879-3.22 1.171-2.635.293-5.27.878-5.27 3.514 0 1.757 1.464 2.928 4.099 2.928 1.757 0 3.514-.293 4.685-1.464.293.877.586 1.464 1.757 1.464h1.463Zm-3.514-3.514c0 1.17-1.464 2.343-3.806 2.343-1.757 0-2.635-.587-2.635-1.757 0-1.757 1.757-2.343 3.806-2.343 1.464-.293 2.343-.586 2.928-.878 0 .585 0 1.757-.293 2.635Zm16.69.586-1.757-.293c-.878 1.463-2.05 2.05-3.807 2.05-1.756 0-3.806-1.172-3.806-4.099 0-2.634 1.757-3.807 3.806-3.807 1.757 0 3.222.586 3.514 1.757l2.049-.293c-.586-1.757-2.635-2.927-5.563-2.927-3.514 0-5.856 2.049-5.856 5.27 0 3.513 2.635 5.271 5.856 5.271 2.929-.001 4.686-.88 5.564-2.929Zm9.077-5.857v-1.756h-.293c-2.05 0-3.221.877-4.099 2.049v-2.049h-2.05v10.54h2.05v-6.734c.586-1.171 1.756-2.344 3.806-2.344 0 .001.293.001.586.294Zm13.469 3.514c0-3.514-2.635-5.27-6.149-5.27-3.514 0-6.149 2.049-6.149 5.27 0 3.513 2.635 5.271 6.149 5.271 3.514 0 6.149-2.05 6.149-5.271Zm-2.051 0c0 2.343-1.464 4.099-4.098 4.099-2.049 0-4.099-1.464-4.099-4.099 0-2.634 2.05-3.807 4.099-3.807 2.049 0 4.098 1.173 4.098 3.807Zm22.547 5.271v-6.149c0-2.05-.878-4.391-4.099-4.391-2.342 0-3.514.877-4.099 2.049-.586-1.464-2.049-2.049-3.514-2.049-2.342 0-3.221 1.17-3.806 1.756v-1.756h-2.05v10.54h2.05v-6.734c.293-.879 1.17-2.344 3.221-2.344 1.464 0 2.635 1.172 2.635 2.928v6.149h2.049v-6.149c0-1.171.878-2.928 2.928-2.928s2.635 1.464 2.635 3.221v5.856h2.05v.001Zm14.639-4.978c0-3.514-2.343-5.563-5.855-5.563-3.221 0-5.856 2.049-5.856 5.27 0 3.513 2.342 5.271 5.856 5.271 2.927 0 4.684-1.171 5.563-2.928l-1.757-.293c-.586 1.171-2.049 2.05-3.806 2.05-2.05 0-3.807-1.464-3.807-3.807h9.662Zm-2.049-1.171h-7.612c0-1.756 2.05-3.221 3.807-3.221 2.048 0 3.512.878 3.805 3.221Zm15.518 6.149v-14.933h-1.757v6.148c-.878-.878-2.342-1.756-4.392-1.756-2.927 0-5.27 1.756-5.27 5.27 0 3.513 2.343 5.271 5.564 5.271 2.049 0 3.513-.878 4.098-1.758v1.758h1.757Zm-1.757-4.1c-.292 1.464-1.756 2.928-3.807 2.928-2.049 0-4.098-1.172-4.098-4.099 0-2.343 1.463-4.099 4.098-4.099 2.051 0 3.515 1.465 3.807 2.928v2.342Zm7.613-7.906v-2.05h-2.05v2.05h2.05Zm-.293 12.006v-10.54h-1.757v10.54h1.757Zm14.64 0v-1.171h-.877c-.294-.293-.587-.587-.587-1.464v-4.392c0-2.343-1.756-3.513-4.685-3.513-2.634 0-4.098.877-5.27 2.049l1.171.878c.877-1.171 2.343-1.464 4.098-1.464 2.051 0 2.635.586 2.635 1.464 0 .586-.293.879-3.221 1.171-2.635.293-5.27.878-5.27 3.514 0 1.757 1.463 2.928 4.099 2.928 1.464 0 3.221-.293 4.685-1.464 0 .877.292 1.464 1.756 1.464h1.466Zm-3.514-3.514c0 1.17-1.464 2.343-3.807 2.343-1.756 0-2.635-.587-2.635-1.757 0-1.757 1.465-2.343 3.515-2.343 1.757-.293 2.634-.586 2.927-.878v2.635Zm-54.753 10.54v-2.635h-.586l-1.17 2.05-1.465-2.05h-.586v2.635h.586v-1.757l1.172 1.757h.293l1.17-1.757v1.757h.586Zm-3.807-2.049v-.586h-2.927v.586h1.171v2.05h.585v-2.05h1.171Zm67.344-12.882c0-1.465-.877-2.929-2.634-2.929s-2.635 1.464-2.635 2.929c0 1.756.878 3.22 2.635 3.22 1.757 0 2.634-1.464 2.634-3.22Zm-.292 0c0 1.463-.879 2.634-2.343 2.634s-2.343-1.171-2.343-2.634c0-1.465.878-2.635 2.343-2.635 1.464-.001 2.343 1.17 2.343 2.635Zm-.879-.88c0-.586-.292-.878-1.17-.878h-1.464v3.807h.586v-2.049h.586l.878 2.049h.585l-.877-2.049c.584 0 .876-.294.876-.88Zm-.585 0c0 .586-.293.586-.586.586h-.878v-1.171h.878c.293 0 .586.292.586.585Z"/><path fill="#B81F25" d="m344.106 256.565-17.276 39.821c-2.635 4.977-13.469-1.464-10.833-6.735l17.861-33.672c1.171.294 2.343.586 3.806.878 2.343.294 4.392 0 6.442-.292Z"/><path fill="#CC2229" d="m353.182 249.83 23.717 45.384c2.049 5.271-9.077 9.37-11.126 4.099l-19.032-43.626c2.927-1.172 5.27-3.221 6.441-5.857Z"/><path fill="#A81C22" d="m331.808 255.102-36.307 14.054c-6.149 2.635-9.37-7.613-2.927-9.956l31.329-10.834c1.757 2.929 4.392 5.27 7.905 6.736Z"/><path fill="#EFC031" d="m322.438 245.146-35.136-21.668c-2.049-.877-.292-3.22 1.757-2.049l33.086 19.324-.293.293c.001 1.464.294 2.929.586 4.1Z"/><path fill="#E7AA30" d="m322.438 238.704-11.418-28.987c-.879-2.342 3.221-2.927 4.098-.878l10.541 24.888c-1.464 1.463-2.635 2.928-3.221 4.977Z"/><path fill="#E0922F" d="m327.709 232.263 12.59-28.694c.878-2.051 4.977-.586 4.099 1.463l-9.37 24.888c-2.635.293-5.269 1.172-7.319 2.343Z"/><path fill="#D04A2A" d="M392.418 271.205c3.807 3.514-1.171 8.491-5.271 4.977l-33.379-27.522c.293-.879.586-2.05.586-3.221 0-1.756-.293-3.513-1.172-4.977l1.172.292 38.064 30.451Z"/><path fill="#D5652C" d="M353.182 240.461c-2.049-5.271-7.32-7.906-7.32-7.906l48.02 12.591c4.684 1.171 2.635 7.613-2.05 6.441l-37.478-10.833-1.172-.293Z"/><path fill="#DA7D2D" d="m376.899 221.136-31.037 11.419c-2.049-1.171-4.392-2.049-7.027-2.342-.586 0-1.464-.293-2.049-.293l36.893-13.177c3.513-1.463 6.734 3.222 3.22 4.393Z"/></g><g><path fill="#4E7896" d="M146.703 256.725s-4.408 2.682 3.066 3.449c9.006 1.15 13.797.958 23.762-.958 0 0 2.683 1.724 6.324 3.066-22.421 9.581-50.782-.575-33.152-5.557Zm-2.875-12.456s-4.791 3.641 2.683 4.407c9.773.958 17.438 1.15 30.661-1.533 0 0 1.725 1.916 4.599 2.875-27.02 8.048-57.298.766-37.943-5.749Zm52.89 21.846s3.258 2.682-3.641 4.79c-12.839 3.833-53.848 4.983-65.346 0-4.024-1.724 3.641-4.216 6.132-4.599 2.491-.575 3.833-.575 3.833-.575-4.408-3.066-29.32 6.324-12.648 9.007 45.8 7.473 83.551-3.258 71.67-8.623Zm-47.908-34.877s-20.887 4.982-7.473 6.707c5.749.766 17.055.575 27.595-.192 8.623-.766 17.247-2.299 17.247-2.299s-3.067 1.341-5.175 2.683c-21.27 5.557-62.088 3.066-50.398-2.683 9.964-4.791 18.204-4.216 18.204-4.216Zm37.369 20.887c21.462-11.114 11.497-21.845 4.599-20.504-1.725.383-2.492.767-2.492.767s.575-1.15 1.917-1.533c13.606-4.791 24.337 14.372-4.408 21.845 0 0 .192-.191.384-.575Zm-35.26 30.278c20.696 1.342 52.315-.766 53.081-10.54 0 0-1.533 3.833-17.055 6.707-17.63 3.258-39.476 2.875-52.315.767 0 0 2.683 2.3 16.289 3.066Z"/><path fill="#F58219" d="M173.148 168s11.881 12.073-11.307 30.278c-18.588 14.755-4.215 23.187 0 32.768-10.922-9.773-18.779-18.396-13.414-26.445 7.857-11.881 29.511-17.63 24.721-36.601Zm-6.132 54.998c5.557 6.324-1.533 12.073-1.533 12.073s14.18-7.282 7.665-16.289c-5.941-8.623-10.54-12.839 14.372-27.211 0 0-39.284 9.773-20.504 31.427Zm-14.181 102.905v-18.78c0-4.791-2.683-8.048-9.39-8.048-3.833 0-7.09.958-9.965 2.108l.958 3.449c2.108-.766 4.791-1.533 7.666-1.533 3.641 0 5.365 1.533 5.365 4.599v2.491h-1.916c-9.198 0-13.414 3.45-13.414 9.007 0 4.599 2.874 7.282 8.048 7.282 3.258 0 5.749-1.533 8.049-3.449l.383 2.874h4.216Zm-5.366-6.132c-1.916 1.725-4.024 2.683-5.94 2.683-2.491 0-4.024-1.533-4.024-4.216 0-2.683 1.533-4.599 7.665-4.599h2.299v6.132Zm23.379 6.132h-6.707l-8.048-26.253h5.749l4.982 16.097 1.15 4.79c2.491-6.898 4.407-13.989 5.174-20.887h5.749c-1.533 8.623-4.216 18.013-8.049 26.253Zm31.044 0v-18.78c0-4.791-2.683-8.048-9.39-8.048-3.832 0-7.09.958-9.965 2.108l.767 3.449c2.3-.766 4.982-1.533 7.857-1.533 3.641 0 5.366 1.533 5.366 4.599v2.491h-1.917c-9.198 0-13.414 3.45-13.414 9.007 0 4.599 2.683 7.282 7.857 7.282 3.449 0 5.941-1.533 8.24-3.449l.383 2.874h4.216Zm-5.365-6.132c-1.917 1.725-4.025 2.683-5.941 2.683-2.491 0-4.024-1.533-4.024-4.216 0-2.683 1.533-4.599 7.665-4.599h2.3v6.132Zm-70.329 10.54c-1.533 2.299-3.832 4.024-6.707 4.982L117 332.227c1.916-1.15 3.833-2.875 4.599-4.408.767-1.341.958-3.257.958-7.665V290.26h5.749v29.511c0 5.94-.575 8.24-2.108 10.54Z"/></g></g></g><defs><filter id="a" width="564" height="414" x="0" y="0" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset/><feGaussianBlur stdDeviation="3.5"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_1380_3"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_1380_3" result="shape"/></filter><filter id="c" width="554" height="34" x="5" y="5" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset/><feGaussianBlur stdDeviation="1"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0"/><feBlend in2="BackgroundImageFix" result="effect1_dropShadow_1380_3"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_1380_3" result="shape"/></filter><linearGradient id="d" x1="7" x2="7" y1="7" y2="37" gradientUnits="userSpaceOnUse"><stop stop-color="#fff"/><stop offset="1" stop-color="#FAFBFC"/></linearGradient></defs></svg>
+          <aside class="notes">
+            <p>Okay, let's talk about extensions.</p>
+            <p>Extensions are meant to extend something, right? So web extensions are meant to extend browser functionality. Which is something people have been trying to do every since commercial browsers became a thing. I think it's a very human thing to want to tweak whatever we're using just a little bit more to suit our preferences or needs.</p>
+            <p>But anyway, I don't know how many of you remember plug-ins, but it was almost a mandatory activity to install Flash and Java on your browser back then. I'm giving my age away, aren't I?</p>
+          </aside>
+        </section>
+
+        <section data-background-image="img/java.jpg">
+          <div style="height:100vh">
+            <p style="position:absolute;bottom:0;right:0;font-size:50%">Image credit: <a href="https://youtu.be/PyGxBh8ZdVk">How to Install Java Plugin for Google Chrome Browser in Windows 7</a></p>
+          </div>
+          <aside class="notes">For what it's worth, I was the token IT guy among my social circles, so the number of times I've seen this 3 billion devices run Java screen, let's just say it was a lot.</aside>
+        </section>
+
+        <section>
+          <h2>User stylesheets</h2>
+          <div style="display:flex;gap:1em;align-items:center">
+            <img data-src="img/stylesheets.png" alt="Illustration of different cascade origins" class="plain" style="max-width:45vw" />
+            <div style="text-align:left;">
+              <a href="https://www.w3.org/TR/css-cascade-4/#cascading-origins">§ 6.2. Cascading Origins</a>
+              <p>Each style rule has a cascade origin, which determines where it enters the cascade. CSS defines three core origins:</p>
+              <p><strong>Author Origin:</strong> The author specifies style sheets for a source document according to the conventions of the document language.</p>
+              <p><strong>User Origin:</strong> The user may be able to specify style information for a particular document.</p>
+              <p><strong>User-Agent Origin:</strong> Conforming user agents must apply a default style sheet (or behave as if they did).</p>
+            </div>
+          </div>
+          <aside class="notes">
+            <p>Another way people extended their web browser was via user-stylesheets. If you have ever read the CSS cascade specification, there are 3 core CSS origins, namely author origin, which is the CSS you and I write at our jobs. There is user-agent origin, which is the styles that are shipped with the browser. But there's also user origin, where users can specify a file that contains as stylesheet with their preferred styles.</p>
+            <p>Unfortunately, Chrome stopped supporting stylesheets in 2014. You can still do it for Firefox but it's a whole series of steps. Only Safari still allows you to define your user stylesheets via the GUI, it's under the Advanced tab in preferences.</p>
+          </aside>
+        </section>
+
+        <section>
+          <h2>Bookmarklets</h2>
+          <img data-src="img/bookmarklets.png" alt="Illustration of JS that can go into the URL field of a bookmark" class="plain" style="max-width:45vw" />
+          <aside class="notes">Then there are things like bookmarklets, where you could run JavaScript on browser bookmarks. You can try it with these simple Javascript functions, they do work. But after CSP became a whole thing, the bookmarklet ecosystem sort of died down as well. Even though the specification says bookmarklets and extensibility features should be exempt from CSP restrictions, it's not that surprising that reality is not what is written in the specs.</aside>
+        </section>
+
+        <section>
+          <img data-src="img/ie4.png" alt="Screenshot of IE4" class="plain" style="max-width:55vw" />
+          <aside class="notes">Browser extensions became a thing back in 1999 because Internet Explorer added this feature in IE4. And these extensions allowed you to modify the browser interface, the web pages being rendered by the browser and generally running extra JavaScript on the site to add some feature or another.</aside>
+        </section>
+
+        <section>
+          <div style="display:grid;grid-template-columns:1fr 1fr;column-gap:1em">
+            <img data-src="img/firefox-ext.webp" alt="Firefox extensions" class="plain" style="max-width:40vw;justify-self:end" />
+            <img data-src="img/chrome-ext.webp" alt="Chrome extensions" class="plain" style="max-width:40vw" />
+            <img data-src="img/safari-ext.webp" alt="Safari extensions" class="plain" style="max-width:40vw;justify-self:end" />
+            <img data-src="img/opera-ext.webp" alt="Opera extensions" class="plain" style="max-width:40vw" />
+          </div>
+          <aside class="notes">
+            <p>Most browsers maintain their own ecosystem of extensions, and have in place numerous processes for security review because extensions have rather extensive permissions to access users' browsing data. Firefox used to implement extensions via the XML User Interface Language (XUL), which was also powering the browser's UI and thus was a more powerful mechanism for extending the browser. Eventually due to maintainability, performance and security reasons, Firebox migrated to WebExtensions in 2017.</p>
+            <p>At this point, enough of the market share now supported the standard WebExtensions API. Eventually, even Safari adopted the WebExtensions API from Safari 14 onwards. Realistically, you still need XCode to build a safari extension, but at least the API is very similar to everyone else's.</p>
+          </aside>
+        </section>
+
+        <section>
+          <h2><code>manifest.json</code></h2>
+          <div style="display:flex;align-items:center;gap:1em;justify-content:center">
+            <div style="max-width:50vw">
+              <pre style="width:max-content" class="json">
+                <code>{
+  "manifest_version": 3,
+  "name": "Awesome Extension",
+  "version": "1.0.0",
+}</code>
+              </pre>
+              <p>"<code>manifest_version</code>", "<code>version</code>", and "<code>name</code>" are the only mandatory keys.</p>
+              <p>See <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json">manifest.json</a> page on MDN for full list of keys</p>
+            </div>
+            <img data-src="img/anatomy.png" alt="Firefox extensions" class="plain" style="max-width:40vw;justify-self:end" />
+          </div>
+          <small>Image source: <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Anatomy_of_a_WebExtension">Anatomy of an extension</a></small>
+          <aside class="notes">
+            <p>So enough history, let's break down what a browser extension is and how it works. The heart of an extension is the `manifest.json` file, which is the only mandatory file that must exist in any web extension. The manifest file contains metadata about the extension, as well as pointers to other files that make up the extension.</p>
+            <p>These other files include background scripts, sidebars, popups and options pages, extension pages, content scripts and web accessible resources. For the rest of this talk, I'll be referring to the syntax used for Manifest V3. These V3 breaking changes are, annoying to me, to say the least, but it is what it is. We'll talk about that more in a bit.</p>
+          </aside>
+        </section>
+
+        <section>
+          <h2>AE1: Does nothing</h2>
+          <div style="display:flex;gap:1em;align-items:center;justify-content:center">
+            <div>
+              <p>Folder structure:</p>
+              <pre style="width:max-content" class="bash"><code>.
+  └── AE1/
+      ├── manifest.json
+      ├── nothing.html
+      └── icons/
+          ├── icon32.png
+          └── icon48.png</code></pre>
+              <p>nothing.html:</p>
+              <pre style="width:max-content"><code>&lt;html&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Nothing&lt;/h1&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                <p>Icons:</p>
+                <div>
+                  <img data-src="img/icon48.png" alt="48px icon" class="plain" />
+                  <img data-src="img/icon32.png" alt="32px icon" class="plain" />
+                </div>
+            </div>
+            <pre style="width:max-content;margin:initial" class="json">
+              <code>{
+  "manifest_version": 3,
+  "name": "AE1",
+  "version": "1.0",
+
+  "description": "This extension doesn't actually do anything",
+  "icons": {
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png"
+  },
+
+  "action": {
+    "default_popup": "nothing.html"
+  }
+}</code></pre>
+          </div>
+          <aside class="notes">
+            <p>The first example here is just to get your browser to recognise that an extension exists. Our manifest.json will have the 3 mandatory keys, and we'll also add the <code>description</code>, <code>icons</code> and <code>action</code> keys. <code>action</code> replaces <code>browser_action</code> in V3.</p>
+            <p>Although <code>description</code> and <code>icons</code> are optional, they are required if you want to publish your extension to the Chrome Web Store. Both these values do enhance the user experience, because they give your extension a pretty icon and a proper description.</p>
+            <p><code>action</code> determines how the extension looks like in your toolbar, and what clicking on it does. <code>popup</code> can contain any HTML content and the window will be automatically sized to fit the content. CSS and Javascript can be included by <code>link</code> and <code>script</code> elements.</p>
+          </aside>
+        </section>
+
+        <section>
+          <div style="display:flex;gap:1em;">
+            <div style="flex:50%">
+              <code>about:debugging#/runtime/this-firefox</code>
+              <p>Open the <code>about:debugging</code> page, click the This Firefox option, click the Load Temporary Add-on button, then select any file in your extension's directory.</p>
+              <p>The extension now installs, and remains installed until you restart Firefox.</p>
+            </div>
+            <div style="flex:50%">
+              <code>chrome://extensions</code>
+              <p>Enable Developer Mode by clicking the toggle switch next to Developer mode.</p>
+              <p>Click the Load unpacked button and select the extension directory.</p>
+            </div>
+          </div>
+          <aside class="notes">If you're a frontend developer like me, you might prefer to have some visual feedback that your code has done something. To load the extension in Firefox, you'll have to load it up as a temporary add-on. The option to reload the extension after you made changes to the source is also available here. For Chrome, you'll have to enable Developer Mode before you can load the unpacked extension. As you can see, the same source works in both browsers.</aside>
+        </section>
+
+        <section>
+          <h2>AE1.1: Does a tiny something</h2>
+          <div style="display:flex;gap:1em;align-items:center;justify-content:center">
+            <div>
+              <p>nothing.html:</p>
+              <pre style="width:max-content"><code>&lt;html&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Nothing&lt;/h1&gt;
+    &lt;button&gt;Something&lt;/button&gt;
+  &lt;/body&gt;
+  &lt;style&gt;
+    body { text-align: center }
+  &lt;/style&gt;
+  &lt;script src="nothing.js"&gt;&lt;/script&gt;
+&lt;/html&gt;</code></pre>
+            </div>
+            <div>
+              <p>nothing.js:</p>
+              <pre style="width:max-content"><code>document.querySelector("button").addEventListener("click", () => {
+  document.querySelector("h1").style.color = "tomato";
+});</code></pre>
+            </div>
+          </div>
+          <aside class="notes">
+            <p>Okay, let's at least make the extension do something, just to prove to ourselves that interactivity with web APIs are a thing in extensions. As mentioned earlier, <code>action</code> adds a button for your extension to the browser's toolbar. The popup is optional, but allows you to build out content with HTML, CSS and Javascript.</p>
+            <p>The environment in which the popup operates is isolated from the web page content loaded by the browser. In this example, <code>nothing.js</code> targets the extremely generic tag elements of <code>button</code> and <code>h1</code>, but this code only affects the elements in the pop-up and not anything on the web page.</p>
+          </aside>
+        </section>
+
+        <section>
+          <h2>Content scripts</h2>
+          <ol>
+            <li>
+              <strong>Static declaration</strong>
+              <p>Register the script using the <code>content_scripts</code> key in your <code>manifest.json</code>. This automatically loads the script on pages that match the specified pattern.</p>
+            </li>
+            <li>
+              <strong>Dynamic declaration</strong>
+              <p>The script is registered with the browser via the <code>scripting.registerContentScripts()</code> method. The difference with the static declaration method is you can add or remove content scripts at runtime.</p>
+            </li>
+            <li>
+              <strong>Programatic injection</strong>
+              <p>Load the script via the <code>scripting.executeScript()</code> method into a specific tab based on particular triggers, e.g. an user action.</p>
+            </li>
+          </ol>
+          <aside class="notes">
+            <p>But a lot of the time, we do want our extension to do something to content on the web page. So for that, we'll need to make use of content scripts, which run in the context of the browser's loaded web page. This is the only way you can access content on the page from your extension.</p>
+            <p>There are 3 ways to load an extension's content script into the web page, namely via static declaration, dynamic declaration or programmatically. These different methods allow for the widest range of use cases, whether you want the extension to modify the default experience out-the-box or based on specific triggers.</p>
+          </aside>
+        </section>
+
+        <section>
+          <h2>Content Script Environment</h2>
+          <div style="display:flex;gap:1em;justify-content:center">
+            <div style="flex:0 0 49%">
+              <h3>Firefox</h3>
+              <p><a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Sharing_objects_with_page_scripts#xray_vision_in_firefox">Xray vision in Firefox</a></p>
+              <ul>
+                <li>The global scope (globalThis) is composed of standard JavaScript features as usual, plus <code>window</code> as the prototype of the global scope.</li>
+                <li>Most DOM APIs are inherited from the page through window, through Xray vision to shield the content script from modifications by the web page.</li>
+                <li>A content script may encounter JavaScript objects from its global scope or Xray-wrapped versions from the web page.</li>
+              </ul>
+            </div>
+            <div style="flex:0 0 49%">
+              <h3>Chrome</h3>
+              <p><a href="https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts#isolated_world">Isolated worlds in Chrome</a></p>
+              <ul>
+                <li>An isolated world is a private execution environment that isn't accessible to the page or other extensions.</li>
+                <li>The global scope is <code>window</code>, and the available DOM APIs are generally independent of the web page (other than sharing the underlying DOM).</li>
+                <li>Content scripts cannot directly access JavaScript objects from the web page.</li>
+              </ul>
+            </div>
+          </div>
+          <aside class="notes">
+            <p>Content scripts are isolated, in the sense that it can make changes to its own JavaScript environment without conflicting with the page or other extensions' content scripts. Even though content scripts can access and change the DOM, they only see the "clean" version of the DOM that has not been modified by any JavaScript.</p>
+            <p>Firefox and Chrome handle this isolation behaviour differently. In Firefox, the concept is called Xray vision, where content scripts may encounter JavaScript objects from its own global scope or Xray-wrapped versions from the web page. </p>
+            <p>While for Chrome, there exists the concept of 3 kinds of worlds, a main world, an isolated world and a worker world. Each world has its own context, its own global variable scope and prototype chains.</p>
+            <p>Content scripts have access to a specific and limited set of extension APIs directly, but for other APIs, a form of message exchange is required, which we will briefly touch upon in the next example.</p>
+          </aside>
+        </section>
+
+        <section>
+          <h2>AE2: Click button, change page</h2>
+          <div style="display:flex;gap:1em;align-items:center;justify-content:center">
+            <div>
+              <p>Folder structure:</p>
+              <pre style="width:max-content" class="bash"><code>.
+└── AE2/
+    ├── content.css
+    ├── content.js
+    ├── manifest.json
+    ├── pixel.html
+    ├── pixel.js
+    ├── icons/
+    │   ├── icon32.png
+    │   └── icon48.png
+    └── images/
+        ├── pixel-adventure-time.png 
+        ├── pixel-cat.jpg 
+        ├── pixel-city.png 
+        └── pixel-zen-garden.png</code></pre>
+        <ul style="font-size:50%">
+          <li>Image source: <a href="https://www.reddit.com/r/PixelArt/comments/1gtsp84/its_adventure_time/">pixel-adventure-time.png</a></li>
+          <li>Image source: <a href="https://1041uuu.tumblr.com/post/766203634738413568/maru">pixel-cat.jpg</a></li>
+          <li>Image source: <a href="https://danbooru.donmai.us/posts/8334002?q=toyoi_yuuta">pixel-city.png</a></li>
+          <li>Image source: <a href="https://www.reddit.com/r/PixelArt/comments/huc2yy/zen_garden/">pixel-zen-garden.png</a></li>
+        </ul>
+            </div>
+            <pre style="width:max-content;margin:initial" class="json">
+              <code style="max-height:initial">{
+  "manifest_version": 3,
+  "name": "AE2",
+  "version": "1.0",
+  "description": "Activate pixel art",
+  "icons": {
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png"
+  },
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_popup": "pixel.html"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "images/pixel-adventure-time.png",
+        "images/pixel-cat.jpg",
+        "images/pixel-city.png",
+        "images/pixel-zen-garden.png"
+      ],
+      "extension_ids": ["*"],
+      "matches": ["*://*/*"]
+    }
+  ]
+}</code></pre>
+          </div>
+          <aside class="notes">
+            <p>This time I want clicking a button on my extension to take over the entire page and cover it all up with some fantastic pixel art I found on the internet. For the extension to recognise and load images, they need to be declared in the <code>manifest.json</code> file with the <code>web_accessible_resources</code> key.</p>
+            <p>Because I'm going for the programmatic script injection approach, my extension would need <code>activeTab</code> permission, which grants the extension extra privileges for the active tab only when an user interaction occurs and the <code>scripting</code> permission, which is required to use methods from the scripting API.</p>
+          </aside>
+        </section>
+
+        <section>
+          <h2>AE2: Click button, change page</h2>
+          <div style="display:flex;gap:1em;align-items:center;justify-content:center">
+            <div>
+              <p>pixel.html:</p>
+              <pre style="width:max-content"><code style="max-height:initial">&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;style&gt;
+      body { text-align: center }
+      h1 { white-space: nowrap }
+      button:first-of-type { margin-block-end: 0.5em }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Pixel-time&lt;/h1&gt;
+    &lt;button id="pixelate"&gt;Pixelate&lt;/button&gt;
+    &lt;button id="reset"&gt;Reset&lt;/button&gt;
+  &lt;/body&gt;
+  &lt;script src="pixel.js"&gt;&lt;/script&gt;
+&lt;/html&gt;</code></pre>
+            </div>
+            <div>
+              <p>pixel.js:</p>
+              <pre style="width:max-content;margin:initial" class="javascript">
+                <code style="max-height:initial">window.browser = (function () {
+  return window.msBrowser || window.browser || window.chrome;
+})();
+
+let id;
+browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+  id = tabs[0].id;
+  browser.scripting.executeScript({
+    target: { tabId: tabs[0].id },
+    files: ["content.js"],
+  });
+  browser.scripting.insertCSS({
+    target: { tabId: tabs[0].id },
+    files: ["content.css"],
+  });
+});
+
+document.getElementById("pixelate").addEventListener("click", () => {
+  browser.tabs.sendMessage(id, { message: "pixelate" });
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  browser.tabs.sendMessage(id, { message: "reset" });
+});</code></pre>
+            </div>
+          </div>
+          <aside class="notes">
+            <p><code>browser.tabs.query()</code> is used here to obtain information about the tab we want to target, specifically, I want the tab ID, because the <code>scripting</code> method requires that I pass it a tab ID, which makes sense since you have to specify the target you want to inject your script into, right?</p>
+            <p>Same goes for injecting CSS. Was it possible to style the stuff I was injecting via JavaScript? Of course, it is. Should you do it that way? It's really up to you. I personally like my styles in CSS files, that's all.</p>
+            <p>So what's this <code>sendMessage()</code> method then? Well, because content scripts run in the context of the web page and not my extension itself, this is the way for the content script to communicate with my extension. The extension and the content scripts will listen for each other's messages and respond on the same channel.</p>
+          </aside>
+        </section>
+
+        <section>
+          <h2>AE2: Click button, change page</h2>
+          <div style="display:flex;gap:1em;align-items:center;justify-content:center">
+            <div>
+              <p>content.js:</p>
+              <pre style="width:max-content"><code style="max-height:600px">window.browser = (function () {
+  return window.msBrowser || window.browser || window.chrome;
+})();
+
+function pickPixelArt(art) {
+  switch (art) {
+    case "a":
+      return browser.runtime.getURL("images/pixel-adventure-time.png");
+    case "b":
+      return browser.runtime.getURL("images/pixel-cat.jpg");
+    case "c":
+      return browser.runtime.getURL("images/pixel-city.png");
+    case "d":
+      return browser.runtime.getURL("images/pixel-zen-garden.png");
+  }
+}
+
+function pickRandomImage() {
+  const array = ["a", "b", "c", "d"];
+  let index = Math.floor(Math.random() * array.length);
+  let random = array[index];
+  return random;
+}
+
+browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.message === "pixelate") {
+    if (!document.getElementById("pixelTime")) {
+      const container = document.createElement("div");
+      container.setAttribute("id", "pixelTime");
+      container.className = "pixel-time";
+      const pixelArt = document.createElement("img");
+      const url = pickPixelArt(pickRandomImage());
+      pixelArt.setAttribute("src", url);
+      container.appendChild(pixelArt);
+      document.body.appendChild(container);
+    } else {
+      console.log("Already pixelated");
+    }
+  }
+
+  if (request.message === "reset") {
+    if (document.getElementById("pixelTime")) {
+      document.getElementById("pixelTime").remove();
+    } else {
+      console.log("No pixels left");
+    }
+  }
+});</code></pre>
+            </div>
+            <div>
+              <p>content.css:</p>
+              <pre style="width:max-content;margin:initial" class="css">
+                <code style="max-height:initial">body:has(.pixel-time) {
+  overflow: hidden;
+}
+
+.pixel-time {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: black;
+  display: flex;
+}
+
+.pixel-time img {
+  margin: auto;
+  width: 100%;
+}</code></pre>
+            </div>
+          </div>
+          <aside class="notes">
+            <p>The way you access images supplied with your extension is using the <code>runtime.getURL()</code> method, which converts the relative path of the image into a fully-qualified URL that your browser can render properly.</p>
+            <p>And the <code>runtime.onMessage()</code> event is used to listen for messages. If you noticed earlier, the click handlers for my 2 buttons are sending either "pixelate" or "reset", depending on which button was clicked. So if the pixelate message comes through, my content script is going to create a container which takes over the entire page and chucks in 1 of the 4 possible pixel images at random. Reset just kills the container altogether.</p>
+          </aside>
+        </section>
+
+        <section>
+          <h2>Manifest v2 versus v3</h2>
+          <div style="display:flex;gap:1em;justify-content:center">
+            <div style="flex:0 0 49%">
+              <h3>v2</h3>
+              <ul>
+                <li>Extension authors have a choice on whether background scripts or a page can be persistent or non-persistent</li>
+                <li>Uses the <code>chrome.webRequest</code> API, a flexible API that lets extensions intercept and block or otherwise modify HTTP requests and responses</li>
+                <li>Code can be hosted remotely</li>
+                <li>Most API methods use callback functions</li>
+              </ul>
+            </div>
+            <div style="flex:0 0 49%">
+              <h3>v3</h3>
+              <ul>
+                <li>Background scripts are run with non-persistent service workers</li>
+                <li>Uses the <code>declarativeNetRequest</code> API, declarative API to specify conditions and actions that describe how network requests should be handled</li>
+                <li>Support is removed for remotely hosted code and execution of arbitrary strings</li>
+                <li>Most API methods return promises</li>
+              </ul>
+            </div>
+          </div>
+          <aside class="notes">
+            <p>I know that when v3 was first introduced, it was a huge thing, there was a lot of backlash and opinion pieces published. Which to summarise, is that v3 has reduced web extensions from being treated like a first-class application with their own persistent execution environment to being treated like accessories with limited privileges and reactive execution capabilities. Largely a consequence of making service workers mandatory and removing the “blocking webRequest” mechanism.</p>
+            <p>Don't cancel me, but I really don't have a strong opinion about the situation at the moment. But what I can say is that, I've run into tutorials that don't seem to work any more even if I take the entire extension source code wholesale and try to load it up in the browser. One example is the MDN tutorial for your second extension.</p>
+          </aside>
+        </section>
+
+        <section>
+          <h2>Migrate v2 to v3 😮‍💨</h2>
+          <div class="fragment">
+            <p>Problem:</p>
+            <pre style="width:max-content"><code class="html">Manifest version 2 is deprecated, and support will be removed in 2024.
+See https://developer.chrome.com/docs/extensions/develop/migrate/mv2-deprecation-timeline for details.</code></pre>
+          </div>
+          <div class="fragment">
+            <p>Fix:</p>
+            <pre style="width:max-content"><code>"manifest_version": 3</code></pre>
+          </div>
+          <aside class="notes">
+            <p>So of course I decided I was going migrate it to v3 just to get it to work, I mean, how hard could it be? There are migration instructions all over the internet, right? We-ll…let's just say left.</p>
+            <p>Okay, in all honesty, it's probably more of a me problem than anything else, but there are a number of breaking changes that took me a while to untangle and work through. So the tutorial on MDN for your second web extension is written for v2. If you try to load it in Chrome, Chrome will yell at you about deprecation timelines.</p>
+            <p>Fine, let's bump the manifest up to v3.</p>
+          </aside>
+        </section>
+
+        <section>
+          <h2>Migrate v2 to v3 😮‍💨</h2>
+          <div>
+            <p>Problem:</p>
+            <img data-src="img/v3-error.png" alt="Error when loading extension" class="plain" style="max-width:40vw" />
+          </div>
+          <div class="fragment">
+            <p>Fix:</p>
+            <pre style="width:max-content"><code>"action": { ... },
+
+"web_accessible_resources": [
+  {
+    "resources": ["beasts/*.jpg"],
+    "extension_ids": ["*"],
+    "matches": ["*://*/*"]
+  }
+]</code></pre>
+          </div>
+          <aside class="notes">Annnd your extension would even load because of syntax errors in the manifest file. We'll convert the impacted keys and values to the v3 syntax. <code>browser_action</code> is now <code>action</code> and <code>web_accessible_resources</code> has changed from taking in an array of paths to an array of objects that include match rules.</aside>
+        </section>
+
+        <section>
+          <h2>Migrate v2 to v3 😮‍💨</h2>
+          <div>
+            <p>Problem:</p>
+            <pre style="width:max-content"><code>Uncaught ReferenceError: browser is not defined
+  at choose_beast.js:100:1</code></pre>
+          </div>
+          <div class="fragment">
+            <p>Fix:</p>
+            <pre style="width:max-content"><code>window.browser = (function () {
+  return window.msBrowser || window.browser || window.chrome;
+})();</code></pre>
+          </div>
+          <aside class="notes">If only the manifest file was the only thing we needed to change. Let the errors start rolling in. The first error Chrome yells at you about will be about namespacing. So we can fix that with this selection of namespaces at the top of your JavaScript file.</aside>
+        </section>
+
+        <section>
+          <h2>Migrate v2 to v3 😮‍💨</h2>
+          <div>
+            <p>Problem:</p>
+            <pre style="width:max-content"><code>Uncaught TypeError: Cannot read properties of undefined (reading 'then')
+  at choose_beast.js:105:3</code></pre>
+          </div>
+          <div class="fragment">
+            <p>Fix:</p>
+            <div style="display:flex;align-items:center">
+              <pre style="width:max-content"><code>/* Replace tabs.executeScript */
+browser.tabs
+  .executeScript({ file: "/content_scripts/beastify.js" })
+  .then(listenForClicks)
+  .catch(reportExecuteScriptError);</code></pre>
+              <pre style="width:max-content"><code>/* With scripting.executeScript */
+browser.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+  browser.scripting
+    .executeScript({
+      target: { tabId: tabs[0].id },
+      files: ["/content_scripts/beastify.js"],
+    })
+    .then(listenForClicks)
+    .catch(reportExecuteScriptError);
+});</code></pre>
+            </div>
+          </div>
+          <aside class="notes">
+            <p>Okay, reload extension, new error. Hmm, this one seems like an issue with promises. Might as well switch over to the new API, since that's what is recommended in the migration guide. <code>tabs.executeScript</code> needs to be changed to <code>scripting.executeScript</code>.</p>
+          </aside>
+        </section>
+
+        <section>
+          <h2>Migrate v2 to v3 😮‍💨</h2>
+          <div>
+            <p>Problem:</p>
+            <pre style="width:max-content"><code>Error handling response: TypeError: Cannot read properties of undefined (reading 'executeScript')
+  at chrome-extension://lejlhkohkjhglbclhhbnbpfjmljmkmkl/popup/choose_beast.js:105:6</code></pre>
+          </div>
+          <div class="fragment">
+            <p>Fix:</p>
+            <pre style="width:max-content"><code>"permissions": ["activeTab", "scripting"]</code></pre>
+          </div>
+          <aside class="notes">And Chrome says what? Chrome now says cannot read properties of undefined. And this is because you need to ask for the scripting permission before you can use any of the scripting APIs. Sure, let's update the manifest file again.</aside>
+        </section>
+
+        <section>
+          <h2>Migrate v2 to v3 😮‍💨</h2>
+          <div>
+            <p>Problem:</p>
+            <pre style="width:max-content"><code>choose_beast.js:63 Could not beastify: TypeError: browser.tabs.insertCSS is not a function</code></pre>
+          </div>
+          <div class="fragment">
+            <p>Fix:</p>
+            <div style="display:flex;align-items:center">
+              <pre style="width:max-content"><code class="javascript">/* Replace tabs.insertCSS */
+function beastify(tabs) {
+  browser.tabs.insertCSS({ code: hidePage }).then(() => {
+    const url = beastNameToURL(e.target.textContent);
+    browser.tabs.sendMessage(tabs[0].id, {
+      command: "beastify",
+      beastURL: url,
+    });
+  });
+}</code></pre>
+              <pre style="width:max-content"><code class="javascript">/* With scripting.insertCSS */
+function beastify(tabs) {
+  browser.scripting.insertCSS({
+    target: { tabId: tabs[0].id },
+    css: `body > :not(.beastify-image) { display: none; }`,
+  })
+  .then(() => {
+    const url = beastNameToURL(e.target.textContent);
+    browser.tabs.sendMessage(tabs[0].id, {
+      command: "beastify",
+      beastURL: url,
+    });
+  });
+}</code></pre>
+            </div>
+          </div>
+          <aside class="notes">
+            <p>Things are progressing. Chrome is now reminding us that <code>tabs.insertCSS</code> also needs to be updated to the v3 syntax, which is <code>scripting.insertCSS</code> and this also requires the scripting permission to work. Aren't you glad we turned it on already?</p>
+            <p>New API takes in new parameters, so instead of <code>code</code>, you pass in <code>css</code> or <code>files</code>. The issue I didn't bother to dig deeper into is that when I tried to assign the CSS to a variable and pass the variable through, the CSS didn't get loaded.</p>
+          </aside>
+        </section>
+
+        <section>
+          <h2>Migrate v2 to v3 😮‍💨</h2>
+          <div>
+            <p>Problem:</p>
+            <pre style="width:max-content"><code>Uncaught (in promise) Error: Could not establish connection. Receiving end does not exist.</code></pre>
+          </div>
+          <div class="fragment">
+            <p>Fix:</p>
+            <pre style="width:max-content"><code>/* Add to content script */
+window.browser = (function () {
+  return window.msBrowser || window.browser || window.chrome;
+})();</code></pre>
+          </div>
+          <aside class="notes">
+            <p>For this one, the error shows up on the web page's console log because it's an issue with the content script and it's the namespacing issue all over again. So once you put in the same namespace fix as before into the content script, it finally, finally all works properly.</p>
+            <p>If I didn't lose you by now, I would like to think that you're all ready to build your own extensions to do whatever you want to your browser experience. And you can go pretty far in terms of what is possible, I mean, if you've seen some of the extensions on the web stores, some of them are pretty complicated.</p>
+          </aside>
+        </section>
+
+        <section>
+          <img data-src="img/wm-logo.svg" alt="Web Monetization" class="plain" style="max-height: 20vh" />
+          <p><a href="https://webmonetization.org/">https://webmonetization.org/</a></p>
+          <p><a href="https://issues.chromium.org/issues/40110471">https://issues.chromium.org/issues/40110471</a></p>
+          <aside class="notes">
+            <p>At the Interledger Foundation, we have a team that is working on a Web Monetization extension. Not sure if any of you have heard of Web Monetization before, but firstly, it's not a web3 thing. It's a new standard that we're incubating at the Web Incubator Community Group or WICG.</p>
+            <p>This proposed standard wants to allow your visitors to pay a website they are consuming an amount of their choosing with little to no user interaction. And it enables a website to automatically signal to web browsers that it can accept payments and enables web browsers to facilitate a payment.</p>
+          </aside>
+        </section>
+
+        <section>
+          <h2>Payment Pointers</h2>
+          <div>
+            <ul>
+              <li>A standardized identifier for payment accounts</li>
+              <li>Used by an account holder to share the details of their account with a counter-party</li>
+            </ul>
+            <pre style="width:max-content"><code class="bash">https://ilp.gatehub.net/747467740/USD</code></pre>
+          </div>
+          <div class="fragment">
+            <p>To implement web monetization on a website:</p>
+            <pre style="width:max-content"><code class="html"><link rel="monetization" href="https://ilp.gatehub.net/747467740/USD"></code></pre>
+          </div>
+          <aside class="notes">
+            <p>A key concept is payment pointers, which are standardized identifiers for payment accounts. Just like how your email address works as your unique identifier in the email ecosystem, payment pointers are your unique identifier for payments.</p>
+            <p>Implementing web monetization on your website involves adding a link tag with your payment pointer into the head of your website. So the next question might be, how does one get a payment pointer? Well, for now, only 2 digital wallet providers offer this capability, and SGD is not supported, yet. But essentially, if we can convince more local digital wallet providers to support payment pointers, this can become a viable alternative to ads or subscription models.</p>
+          </aside>
+        </section>
+
+        <section>
+          <div style="border-radius:50%;height:9em;width:9em;display:flex;margin:auto;background-color:#e1e1e1">
+            <img data-src="img/wm-icon.svg" alt="Web Monetization extension" class="plain" style="max-height:4em;margin:auto" />
+          </div>
+          <p><a href="https://github.com/interledger/web-monetization-extension">https://github.com/interledger/web-monetization-extension</a></p>
+          <aside class="notes">
+            <p>We are collaborating with browser engineers to get this standard implemented in Chromium, but the speed of getting a new feature into a browser ranges from slow to slower to your toddler has already gone off to do NS already. So our next best plan is to implement our standard in the browser via an extension.</p>
+            <p>The web monetization extension is one of the open-source projects that we work on, among a number of others, so if you take a peek into our organisation's GitHub account, you basically see everything that our tech team does. We also welcome contributions and participation, if open-source is something you're into. Please feel free to poke around our code.</p>
+          </aside>
+        </section>
+
+        <section>
+          <p><a href="https://github.com/interledger/web-monetization-extension/blob/eff212733de71444ff033f131ee3e3c4f000af29/src/background/services/background.ts#L70-L73">https://github.com/interledger/web-monetization-extension/blob/eff212733de71444ff033f131ee3e3c4f000af29/src/background/services/background.ts#L70-L73</a></p>
+          <pre ><code style="max-height:initial" class="typescript">async injectPolyfill() {
+  try {
+    await this.browser.scripting.registerContentScripts([
+      {
+        world: 'MAIN',
+        id: 'polyfill',
+        allFrames: true,
+        js: ['polyfill/polyfill.js'],
+        matches: PERMISSION_HOSTS.origins,
+        runAt: 'document_start',
+      },
+    ]);
+  } catch (error) {
+    // Firefox <128 will throw saying world: MAIN isn't supported. So, we'll
+    // inject via contentScript later. Injection via contentScript is slow,
+    // but apart from WM detection on page-load, everything else works fine.
+    if (!error.message.includes(`world`)) {
+      this.logger.error(
+        `Content script execution world \`MAIN\` not supported by your browser.\n` +
+          `Check https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/scripting/ExecutionWorld#browser_compatibility for browser compatibility.`,
+        error,
+      );
+    }
+  }
+}</code></pre>
+          <aside class="notes">
+            <p>Our extension is built on React, yes you can use React to build web extensions. The standard specifies a <code>MonetizationEvent</code> interface that we need to define in the context of web pages for the whole thing to work.</p>
+            <p>The latest browsers support this relatively new <code>scripting.ExecutionWorld</code> API, and for our extension, we need to use the value <code>MAIN</code> because it allows us to have things defined in the page's context.</p>
+            <p>The issue is that we are supporting browsers earlier than Firefox 128, which doesn't recognise <code>MAIN</code>, and therefore our fallback involves injecting the script manually via content script.</p>
+          </aside>
+        </section>
+
+        <section>
+          <p><a href="https://github.com/interledger/web-monetization-extension/blob/eff212733de71444ff033f131ee3e3c4f000af29/src/content/services/contentScript.ts#L70-L74">https://github.com/interledger/web-monetization-extension/blob/eff212733de71444ff033f131ee3e3c4f000af29/src/content/services/contentScript.ts#L70-L74</a></p>
+          <pre><code style="max-height:initial" class="typescript">// Todo: When Firefox has good support for `world: MAIN`, inject this directly
+// via manifest.json https://bugzilla.mozilla.org/show_bug.cgi?id=1736575 and
+// remove this, along with injectPolyfill from background
+// See: https://github.com/interledger/web-monetization-extension/issues/607
+
+async injectPolyfill() {
+  const document = this.window.document;
+  const script = document.createElement('script');
+  script.src = this.browser.runtime.getURL('polyfill/polyfill.js');
+  await new Promise&lt;void>((resolve) => {
+    script.addEventListener('load', () => resolve(), { once: true });
+    document.documentElement.appendChild(script);
+  });
+  script.remove();
+}</code></pre>
+          <aside class="notes">Since this is Firefox, the Xray vision approach to isolation is still present, but if there is something defined in the same context, we don't actually need Xray vision. And our content script is run in a regular isolated context, so we are making use of cloning to pass content to our <code>polyfill</code> content script, which we then emit from <code>MAIN</code> context.</aside>
+        </section>
+
+        <section>
+          <p><a href="https://github.com/interledger/web-monetization-extension/blob/eff212733de71444ff033f131ee3e3c4f000af29/src/content/polyfill.ts#L103">https://github.com/interledger/web-monetization-extension/blob/eff212733de71444ff033f131ee3e3c4f000af29/src/content/polyfill.ts#L103</a></p>
+          <pre><code style="max-height:initial" class="typescript">window.addEventListener(
+  '__wm_ext_monetization',
+  (event: CustomEvent&lt;MonetizationEventPayload['details']>) => {
+    if (!(event.target instanceof HTMLLinkElement)) return;
+    if (!event.target.isConnected) return;
+
+    const monetizationTag = event.target;
+    monetizationTag.dispatchEvent(
+      new MonetizationEvent('monetization', event.detail),
+    );
+  },
+  { capture: true },
+);
+
+window.addEventListener(
+  '__wm_ext_onmonetization_attr_change',
+  (event: CustomEvent<{ attribute?: string }>) => {
+    if (!event.target) return;
+
+    const { attribute } = event.detail;
+    // @ts-expect-error: we're defining this now
+    event.target.onmonetization = attribute
+      ? new Function(attribute).bind(event.target)
+      : null;
+  },
+  { capture: true },
+);</code></pre>
+          <aside class="notes">Another interesting thing our extension does that is probably not that common among web extensions is how we make sure that <code>MonetizationEvent</code> interface gets fired on link elements. We dispatch an internal event (prefixed with <code>__wm_ext</code>) and listen to those events to figure out when to dispatch our <code>MonetizationEvent</code>. At least, this is the approach we're taking to make ensure the behaviour matches the specification.</aside>
+        </section>
+
+        <section>
+          <img data-src="img/qr-code.png" alt="webmonetization.org" class="plain" style="max-height: 50vh" />
+          <p><a href="https://webmonetization.org/">https://webmonetization.org/</a></p>
+          <aside class="notes">Now I totally understand if I lost you at the last 3 slides, and full disclosure, I just needed a reason to mention web monetization. If you are a web extension developer, we do welcome you to come look at the code for the extension and make suggestions if you have any. If the concept of web monetization intrigues you, then I encourage you to visit webmonetization.org which has more information about how it all works.</aside>
+        </section>
+
+        <section>
+          <h2>References</h2>
+          <ul>
+            <li><a href="https://medium.com/brick-by-brick/a-brief-history-of-browser-extensibility-bcfeb4181c9a">A Brief History of Browser Extensibility</a></li>
+            <li><a href="https://yoric.github.io/post/why-did-mozilla-remove-xul-addons/">Why Did Mozilla Remove XUL Add-ons?</a></li>
+            <li><a href="https://developer.apple.com/documentation/safariservices/safari-web-extensions">Safari web extensions</a></li>
+            <li><a href="https://issues.chromium.org/issues/41091633#comment4">Chromium removed support for user stylesheets</a></li>
+            <li><a href="https://davidwalsh.name/firefox-user-stylesheet">How to Add a User Stylesheet in Firefox</a></li>
+            <li><a href="https://www.freecodecamp.org/news/what-are-bookmarklets/">What are Bookmarklets? How to Use JavaScript to Make a Bookmarklet in Chromium and Firefox</a></li>
+            <li><a href="https://developer.apple.com/documentation/safariservices/creating-a-safari-web-extension">Creating a Safari web extension</a></li>
+          <li><a href="https://www.eff.org/deeplinks/2021/12/googles-manifest-v3-still-hurts-privacy-security-innovation">Google’s Manifest V3 Still Hurts Privacy, Security, and Innovation</a></li>
+          </ul>
+        </section>
+
+        <section style="text-align:left">
+          <h1>Thank you</h1>
+          <p class="align-icon"><img class="j-icon plain" data-src="img/home.png" alt="Website"><a href="https://chenhuijing.com">https://chenhuijing.com</a></p>
+          <p class="align-icon"><img class="j-icon plain" data-src="img/github.png" alt="GitHub"><a href="https://github.com/huijing">@huijing</a></p>
+          <p class="align-icon"><img class="j-icon plain" data-src="img/mastadon.png" alt="Mastadon"><a href="https://tech.lgbt/@huijing">@huijing@tech.lgbt</a></p>
+          <p class="align-icon"><img class="j-icon plain" data-src="img/bluesky.png" alt="BlueSky"><a href="https://bsky.app/profile/huijing.bsky.social">@huijing.bsky.social</a></p>
+          <p style="text-align:right"><small>Font is <a href="https://www.erikdkennedy.com/projects/figtree.html">Figtree</a> by <a href="https://www.erikdkennedy.com/">Erik Kennedy</a>.</small></p>
+        </section>
+      </div>
+
+      <footer style="position:absolute;width:calc(100% - 1em);bottom:0;font-size:40%;z-index:1;display:flex;justify-content:space-between;padding:0.5em"><span>https://huijing.github.io/slides/109-ijs-2024</span><span style="text-align:right">@huijing.bsky.social</span></footer>
+    </div>
+
+    <script src="dist/reveal.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script>
+      Reveal.initialize({
+        width: 1920,
+        height: 1080,
+        hash: true,
+        plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
+        transition: 'fade',
+      });
+    </script>
+  </body>
+</html>
