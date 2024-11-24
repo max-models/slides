@@ -213,3 +213,7 @@
 106. [The State of the Web Platform](https://huijing.github.io/slides/106-code-leaders-2024)
 
 107. [The State of CSS](https://huijing.github.io/slides/107-code-2024)
+
+108. [CSS for internationalisation](https://huijing.github.io/slides/108-dsw-2024/)
+
+109. [Expanding the browser experience with web extensions](https://huijing.github.io/slides/109-ijs-2024/)

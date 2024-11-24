@@ -6,7 +6,7 @@ Hello everyone at IJS! First of all, I want to express my gratitude that you cho
 
 I'm always happy to speak in front of a more local crowd, local to me, that is, because then I don't have to explain my name as thoroughly. But just in case you are unfamiliar with Chinese names, this is the graphic I use to explain mine. Also, I have been on BlueSky since mid-2023 and all of a sudden in the past 3 weeks or so, it just exploded. So might as well put my link up here, I guess?
 
-I do have a day job, because I need to pay my bills and feed myself. And the organisation who is paying my CPF at the moment is the Interledger Foundation, which is a non-profit headquartered in the US. And we are trying to build out an inter-network for the various payment networks that exist in the world today, so that we can live in a world where sending a payment can be as straightforward as sending an email. That's about all I'm going to say about my day-job, but if that sounded interesting to you, feel free to come chat with me about payments. Or even better, come chat with me about CSS.
+I do have a day job, because I need to pay my bills and feed myself. And the organisation who is paying my CPF at the moment is the Interledger Foundation, which is a non-profit headquartered in the US. And we are trying to connect all the various payment networks that exist in the world today, so that we can live in a world where sending a payment can be as straightforward as sending an email. That's about all I'm going to say about my day-job, but if that sounded interesting to you, feel free to come chat with me about payments. Or even better, come chat with me about CSS.
 
 ## On the history of extending browser functionality
 
@@ -14,9 +14,9 @@ Okay, let's talk about extensions.
 
 Extensions are meant to extend something, right? So web extensions are meant to extend browser functionality. Which is something people have been trying to do every since commercial browsers became a thing. I think it's a very human thing to want to tweak whatever we're using just a little bit more to suit our preferences or needs.
 
-But anyway, I don't know how many of you remember plug-ins, but it was almost a mandatory activity to install Flash and Java on your browser back then. I'm giving my age away, aren't I?
+I don't know how many of you remember plug-ins, but it was almost a mandatory activity to install Flash and Java on your browser back then, especially if you were the one who was “good with computers”. And if you played games, sometimes the site would ask you to install some ActiveX plugin otherwise the game wouldn't load. I'm giving my age away, aren't I?
 
-For what it's worth, I was the token IT guy among my social circles, so the number of times I've seen this 3 billion devices run Java screen, let's just say it was a lot.
+For what it's worth, I was the token IT guy among my social circles, so the number of times I've seen this 3 billion devices run Java screen… let's just say it was a lot.
 
 Another way people extended their web browser was via user-stylesheets. If you have ever read the CSS cascade specification, there are 3 core CSS origins, namely author origin, which is the CSS you and I write at our jobs. There is user-agent origin, which is the styles that are shipped with the browser. But there's also user origin, where users can specify a file that contains as stylesheet with their preferred styles.
 
@@ -64,23 +64,41 @@ Content scripts have access to a specific and limited set of extension APIs dire
 
 ## On letting your extension interact with the web page
 
-This time, I want clicking a button on my extension to take over the entire page and cover it all up with some fantastic pixel art I found on the internet. For the extension to recognise and load images, they need to be declared in the manifest.json file with the web_accessible_resources key.
+This time, I want clicking a button on my extension to take over the entire page and cover it all up with some fantastic pixel art I found on the internet. For the extension to recognise and load images, they need to be declared in the `manifest.json` file with the `web_accessible_resources` key.
 
 Because I'm going for the programmatic script injection approach, my extension would need activeTab permission, which grants the extension extra privileges for the active tab only when an user interaction occurs and the scripting permission, which is required to use methods from the scripting API.
 
-browser.tabs.query() is used here to obtain information about the tab we want to target, specifically, I want the tab ID, because the scripting method requires that I pass it a tab ID, which makes sense since you have to specify the target you want to inject your script into, right?
+`browser.tabs.query()` is used here to obtain information about the tab we want to target, specifically, I want the tab ID, because the scripting method requires that I pass it a tab ID, which makes sense since you have to specify the target you want to inject your script into, right?
 
 Same goes for injecting CSS. Was it possible to style the stuff I was injecting via JavaScript? Of course, it is. Should you do it that way? It's really up to you. I personally like my styles in CSS files, that's all.
 
-So what's this sendMessage() method then? Well, because content scripts run in the context of the web page and not my extension itself, this is the way for the content script to communicate with my extension. The extension and the content scripts will listen for each other's messages and respond on the same channel.
+So what's this `sendMessage()` method then? Well, because content scripts run in the context of the web page and not my extension itself, this is the way for the content script to communicate with my extension. The extension and the content scripts will listen for each other's messages and respond on the same channel.
 
 The way you access images supplied with your extension is using the runtime.getURL() method, which converts the relative path of the image into a fully-qualified URL that your browser can render properly.
 
-And the runtime.onMessage() event is used to listen for messages. If you noticed earlier, the click handlers for my 2 buttons are sending either "pixelate" or "reset", depending on which button was clicked. So if the pixelate message comes through, my content script is going to create a container which takes over the entire page and chucks in 1 of the 4 possible pixel images at random. Reset just kills the container altogether.
+And the `runtime.onMessage()` event is used to listen for messages. If you noticed earlier, the click handlers for my 2 buttons are sending either "pixelate" or "reset", depending on which button was clicked. So if the pixelate message comes through, my content script is going to create a container which takes over the entire page and chucks in 1 of the 4 possible pixel images at random. Reset just kills the container altogether.
+
+## On background scripts
+
+Another type of script that is seen in web extensions are background scripts. They are meant to monitor events in the browser and react to them accordingly. For example, if you wanted to implement keyboard shortcuts for your extension, you could make use of a background script to listen for specific commands and trigger some action accordingly.
+
+Now we're going to add some keyboard shortcuts to the extension. For that, we'll make use of a background script. Some of you might be thinking, why are we declaring the `background.js` file twice? Well, this is one of those v2-v3 Chrome-Firefox incompatibility issues. If you just used the new v3 syntax `service_worker` alone, Firefox will yell at you saying that background.service_worker is currently disabled, and it won't even load your extension. Chrome will give you a warning, but without `service_worker`, whatever is in your `background.js` file doesn't get executed either. The solution? Just put both in there.
+
+The Commands API lets us define commands and bind them to specific key combinations. These commands must first be declared as properties in the manifest.json file. We then listen for an `onCommand` event to be fired using the background script and run whatever we want to run when the correct key combination is pressed. There are 4 special shortcuts with default actions for which the onCommand event doesn't fire, and `_execute_action` is one of them. This shortcut acts as if the user clicked on the extension icon in the toolbar.
+
+In the background.js file, we make use of the onCommand.addListener to bind a handler to each of the commands listed in the manifest. As mentioned previously, the `_execute_action` command doesn't trigger an event, so we don't need a handler for that. Key combination pressed, command fired, send message to content script to run function.
+
+Okay, so we can try this out on the International JS page again, load the extension up, and press Ctrl+Shift+Y to trigger my pop-up, then Alt+A to pixelate, and Ctrl+Shift+E to reset. Ctrl on Mac defaults to Cmd it seems.
+
+This service worker thing is one of the major points of contention around manifest v3. In manifest v2, extension authors could choose whether the background script or background page is persistent or non-persistent. Persistent means that the script or page is loaded once the extension starts and only unloads after the extension is disabled or uninstalled.
+
+Non-persistent background scripts are only loaded when they need to respond to an event and unloaded when they become idle. Background pages can stay loaded until all visible views and message ports are closed. In v3, background scripts are now service workers and there is no option for them to be persistent any more.
+
+This is concerning for a lot of existing extensions that do things like playing audio, parsing HTML, requesting geolocation and a rather long list of others, because the service worker approach breaks them. There's an issue on GitHub tracking all of these. And it's probably something to keep in mind if you're planning to delve into the world of extension development.
 
 ## On the migration from v2 to v3
 
-I know that when v3 was first introduced, it was a huge thing, there was a lot of backlash and opinion pieces published. Which to summarise, is that v3 has reduced web extensions from being treated like a first-class application with their own persistent execution environment to being treated like accessories with limited privileges and reactive execution capabilities. Largely a consequence of making service workers mandatory and removing the “blocking webRequest” mechanism.
+When v3 was first introduced, it was a huge thing, there was a lot of backlash and opinion pieces published. Which to summarise, is that v3 has reduced web extensions from being treated like a first-class application with their own persistent execution environment to being treated like accessories with limited privileges and reactive execution capabilities. Largely a consequence of making service workers mandatory and removing the “blocking webRequest” mechanism.
 
 Don't cancel me, but I really don't have a strong opinion about the situation at the moment. But what I can say is that, I've run into tutorials that don't seem to work any more even if I take the entire extension source code wholesale and try to load it up in the browser. One example is the MDN tutorial for your second extension.
 
@@ -131,3 +149,7 @@ Since this is Firefox, the Xray vision approach to isolation is still present, b
 Another interesting thing our extension does that is probably not that common among web extensions is how we make sure that MonetizationEvent interface gets fired on link elements. We dispatch an internal event (prefixed with \_\_wm_ext) and listen to those events to figure out when to dispatch our MonetizationEvent. At least, this is the approach we're taking to make ensure the behaviour matches the specification.
 
 Now I totally understand if I lost you at the last 3 slides, and full disclosure, I just needed a reason to mention web monetization. If you are a web extension developer, we do welcome you to come look at the code for the extension and make suggestions if you have any. If the concept of web monetization intrigues you, then I encourage you to visit webmonetization.org which has more information about how it all works.
+
+## Wrapping up
+
+These are the list of references for a lot of the topics and issues I mentioned over the past 30-40 minutes, for those of you who want more in-depth information. And thank you all for your time and attention.
