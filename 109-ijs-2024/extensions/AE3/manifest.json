@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "AE3",
+  "version": "1.0",
+  "description": "Activate pixel art with keyboard shortcuts",
+  "icons": {
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png"
+  },
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_popup": "pixel.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "scripts": ["background.js"]
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y"
+      }
+    },
+    "pixelate": {
+      "suggested_key": {
+        "default": "Alt+A"
+      },
+      "description": "Send a 'pixelate' event to the extension"
+    },
+    "reset": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+E"
+      },
+      "description": "Send a 'reset' event to the extension"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "images/pixel-adventure-time.png",
+        "images/pixel-cat.jpg",
+        "images/pixel-city.png",
+        "images/pixel-zen-garden.png"
+      ],
+      "extension_ids": ["*"],
+      "matches": ["*://*/*"]
+    }
+  ]
+}

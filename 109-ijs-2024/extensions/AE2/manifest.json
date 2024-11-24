@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "AE2",
+  "version": "1.0",
+  "description": "Activate pixel art",
+  "icons": {
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png"
+  },
+  "permissions": ["activeTab", "scripting"],
+  "action": {
+    "default_popup": "pixel.html"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "images/pixel-adventure-time.png",
+        "images/pixel-cat.jpg",
+        "images/pixel-city.png",
+        "images/pixel-zen-garden.png"
+      ],
+      "extension_ids": ["*"],
+      "matches": ["*://*/*"]
+    }
+  ]
+}

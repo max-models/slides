@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "AE1",
+  "version": "1.0",
+
+  "description": "This extension doesn't actually do anything",
+  "icons": {
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png"
+  },
+
+  "action": {
+    "default_popup": "nothing.html"
+  }
+}
