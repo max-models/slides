@@ -35,6 +35,10 @@ settings.$selectionColor: #fff;
 
 // Customised styles for this presentation -----
 .reveal {
+  h1 {
+    line-height: 1.09;
+  }
+
   .l-multiple {
     display: flex;
     justify-content: space-around;

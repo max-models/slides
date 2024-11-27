@@ -370,6 +370,9 @@
     background-color: var(--r-background-color);
   }
 }
+.reveal h1 {
+  line-height: 1.09;
+}
 .reveal .l-multiple {
   display: flex;
   justify-content: space-around;
