@@ -1,3 +1,0 @@
-# So your designer wants a masthead...
-
-At Talk.CSS #7, on 23 June 2016.
